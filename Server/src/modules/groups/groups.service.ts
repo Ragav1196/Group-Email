@@ -19,4 +19,10 @@ export class GroupsService {
       where: { groupName: name },
     });
   }
+
+  async getAllGroup() {
+    const groups = await this._groupsRepository.find();
+    const groupNames = groups.map((g) => g['groupName']);
+    return groupNames;
+  }
 }
