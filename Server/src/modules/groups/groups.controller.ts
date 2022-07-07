@@ -10,4 +10,9 @@ export class GroupsController {
   createGroup(@Body() _groupDto: groupDto) {
     return this._groupsService.createGroup(_groupDto);
   }
+
+  @Get('get-groups')
+  getAllGroup() {
+    return this._groupsService.getAllGroup();
+  }
 }
