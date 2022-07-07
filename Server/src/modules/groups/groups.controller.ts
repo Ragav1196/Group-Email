@@ -1,0 +1,13 @@
+import { Controller, Get, Post, Body } from '@nestjs/common';
+import { groupDto } from './dto/create-groups.dto';
+import { GroupsService } from './groups.service';
+
+@Controller('groups')
+export class GroupsController {
+  constructor(private readonly _groupsService: GroupsService) {}
+
+  @Post()
+  createGroup(@Body() _groupDto: groupDto) {
+    return this._groupsService.createGroup(_groupDto);
+  }
+}
