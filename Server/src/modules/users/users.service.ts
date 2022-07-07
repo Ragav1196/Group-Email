@@ -13,13 +13,11 @@ export class UsersService {
   ) {}
 
   async createUser(userDetails) {
-    return await this._groupService.findGroupByName(
-      userDetails.groupName,
-    );
+    const res = await this._groupService.findGroupByName(userDetails.groupName);
 
-    // delete userDetails.groupName;
-    // userDetails.groupId = id;
+    delete userDetails.groupName;
+    userDetails.groupId = res['id'];
 
-    // return await this._userRepository.save(userDetails);
+    return await this._userRepository.save(userDetails);
   }
 }

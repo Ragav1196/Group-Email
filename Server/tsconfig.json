@@ -12,9 +12,6 @@
     "baseUrl": "./",
     "incremental": true,
     "alwaysStrict": true,
-    "lib": [
-      "ES2021.String",
-      "ESNext.String"
-    ]
+    "lib": ["ES2021.String", "ESNext.String"]
   }
 }
