@@ -10,7 +10,8 @@ export class CommonServiceService {
 
   }
 
-  apiURL:any = 'http://localhost:3200'
+  apiURL: any = 'http://localhost:3000'
+  
 
   post(URL: any, data: any){
     return this.service.post(`${this.apiURL}${URL}`,data)

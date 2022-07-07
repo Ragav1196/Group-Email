@@ -33,12 +33,12 @@ export class GroupCreationComponent implements OnInit {
     let data = this.apForm.value;
 
     let sendData = {
-      groupname: data.groupname,
+      groupName: data.groupname,
     }
     console.log('GROUP NAME', sendData);
     {
       this.api
-        .post('/groupname', sendData)
+        .post('/groups/create', sendData)
         .subscribe(
           (res: any) => {
             if (res['statusCode'] == 200) {
