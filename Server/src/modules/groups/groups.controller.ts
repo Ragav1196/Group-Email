@@ -6,7 +6,7 @@ import { GroupsService } from './groups.service';
 export class GroupsController {
   constructor(private readonly _groupsService: GroupsService) {}
 
-  @Post()
+  @Post('create')
   createGroup(@Body() _groupDto: groupDto) {
     return this._groupsService.createGroup(_groupDto);
   }
