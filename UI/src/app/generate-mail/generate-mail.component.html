@@ -21,11 +21,16 @@
     <br /><br />
     <input
       type="file"
+      (change)="handleUpload($event)"
       formControlName="files"
       id="myfile"
       name="myfile"
       multiple
     />
+    <br /><br />
+
+    <label for="myfile">Uploaded File</label>
+    <br /><br />
     <br /><br />
 
     <label for="myfile">Select Group Name:</label>

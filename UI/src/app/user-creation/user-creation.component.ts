@@ -45,11 +45,11 @@ export class UserCreationComponent implements OnInit {
     let val = this.apform.value;
     
     let sendUser = {
-      firtsname: val.firtsname,
-      lastname: val.lastname,
-      phonenumber: val.phonenumber,
-      emailaddress: val.emailaddress,
-      groupname: val.groupname
+      firstName: val.firtsname,
+      lastName: val.lastname,
+      mobile: val.phonenumber,
+      email: val.emailaddress,
+      groupName: val.groupname
     }
     console.log('USER DEATILS', sendUser);
   

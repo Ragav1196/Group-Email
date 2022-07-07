@@ -9,7 +9,9 @@ import { CommonServiceService } from '../common-service.service';
 export class GenerateMailComponent implements OnInit {
 
   apMail!: FormGroup;
+  files: any;
   rep: any;
+
   constructor(
     private api: CommonServiceService,
     private formBuilder: FormBuilder
@@ -21,10 +23,10 @@ export class GenerateMailComponent implements OnInit {
         '', [Validators.required]
       ],
       files: [
-        [], [Validators.required]
+        '', [Validators.required]
       ],
       groupname: [
-        '', [Validators.required]
+        ''
       ],
       date: [
         '', [Validators.required]
@@ -32,19 +34,42 @@ export class GenerateMailComponent implements OnInit {
 
     })
   }
+
+
+  // decode() {
+  //   let val = "QzpcZmFrZXBhdGhcZG93bmxvYWQucG5n"
+  //   let decoded = window.atob(val);
+  //    window.open(decoded);
+
+  // }
+
+  handleUpload(event:any) {
+    const file = event.target.files;
+    console.log("FILES",file);
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      // console.log("ANSWER FOR BASE 64", reader.result);
+      this.files = reader.result
+    };
+}
+
+
+
   sendMail() {
     let data = this.apMail.value;
-    let encode = window.btoa(data.files);
+    // let encode = window.btoa(data.files);
+    // console.log('DECODED',window.atob(encode));    
     let sendData = {
-      mailtemplate: data.mailtemplate,
-      files: encode,
-      groupname: data.groupname,
-      date: data.date
+      content: data.mailtemplate,
+      attachment: [this.files] ,
+      groupName: data.groupname,
+      ScheduleDate: data.date
     }
     console.log('MAIL TEMPLATE', sendData);
     {
       this.api
-        .post('/mail-template', sendData)
+        .post('/email-template', sendData)
         .subscribe(
           (res: any) => {
             if (res['statusCode'] == 200) {
@@ -60,4 +85,6 @@ export class GenerateMailComponent implements OnInit {
       )
     }
   }
+
+  
 }
