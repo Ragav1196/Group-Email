@@ -27,7 +27,7 @@ export class EmailTemplate extends BaseEntity {
   groupName: string;
 
   @Column()
-  ScheduleDate: Date;
+  ScheduleDate: string;
 
   @Column({ default: Flags.N })
   isSent: Flags;
