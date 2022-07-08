@@ -39,7 +39,13 @@
       name="groupname"
       formControlName="groupname"
       id="groupname"
-    ></select>
+      multiple
+    >
+      <option value="default">----</option>
+      <option *ngFor="let groupname of groupNames" [value]="groupname">
+        {{ groupname }}
+      </option>
+    </select>
     <br /><br />
 
     <label for="myfile">Sechudule Date:</label>

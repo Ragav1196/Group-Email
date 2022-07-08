@@ -10,13 +10,8 @@ export class EmailTemplateController {
     return this.emailTemplateService.scheduleEmail(_createEmailTemplateDto);
   }
 
-  @Get()
-  getScheduledEmail() {
-    return this.emailTemplateService.getScheduledEmail();
-  }
-
   @Post('send-email')
-  sendEmail(@Body() _createEmailTemplateDto: CreateEmailTemplateDto) {
-    return this.emailTemplateService.sendEmail(_createEmailTemplateDto);
+  sendEmail(/* @Body() _createEmailTemplateDto: CreateEmailTemplateDto */) {
+    return this.emailTemplateService.sendEmail(/* _createEmailTemplateDto */);
   }
 }

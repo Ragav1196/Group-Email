@@ -6,11 +6,9 @@ export class CreateEmailTemplateDto {
   content: string;
 
   @IsNotEmpty()
-  // @IsArray()
   attachment: string[];
 
-  // @IsNotEmpty()
-  // @IsArray()
+  @IsNotEmpty()
   groupName: string[];
 
   @IsNotEmpty()
