@@ -24,7 +24,7 @@ export class EmailTemplateService {
     return await this._emailTemplateRepository.save(emailDetails);
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_10PM)
+  @Cron(CronExpression.EVERY_DAY_AT_10AM)
   async sendEmail() {
     try {
       const mailToSend = await this._emailTemplateRepository.find({
