@@ -32,7 +32,12 @@ export class EmailTemplateService {
       });
 
       mailToSend.map(async (toSend) => {
-        if (new Date(toSend['ScheduleDate']).getDate === new Date().getDate) {
+        console.log(
+          new Date(toSend['ScheduleDate']).getDate() === new Date().getDate(),
+        );
+        if (
+          new Date(toSend['ScheduleDate']).getDate() === new Date().getDate()
+        ) {
           toSend['attachment'] = JSON.parse(toSend['attachment']);
           toSend['groupName'] = JSON.parse(toSend['groupName']);
 
@@ -57,10 +62,11 @@ export class EmailTemplateService {
             const res = await entityManager.query(
               `select email  from "tblGroups" tg  inner join "tblUsers" tu on tu."groupId" = tg.id where "groupName" = '${toSend.groupName[i]}'`,
             );
-            userEmails.push(res[0]);
+            userEmails.push(...res);
           }
 
           userEmails.map(async (mails) => {
+            console.log(mails['email']);
             const mail = {
               to: mails['email'],
               subject: 'Hello',
