@@ -29,10 +29,6 @@
     />
     <br /><br />
 
-    <label for="myfile">Uploaded File</label>
-    <br /><br />
-    <br /><br />
-
     <label for="myfile">Select Group Name:</label>
     <br /><br />
     <select
@@ -41,7 +37,7 @@
       id="groupname"
       multiple
     >
-      <option value="default">----</option>
+      <option value="default">Select Group</option>
       <option *ngFor="let groupname of groupNames" [value]="groupname">
         {{ groupname }}
       </option>

@@ -4,6 +4,7 @@ import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { getManager, Repository } from 'typeorm';
 import { EmailTemplateRepository } from '../../repository/email-template.repository';
 import { config } from 'dotenv';
+import { Flags } from 'src/entities/email-template.entity';
 
 config();
 
@@ -18,6 +19,7 @@ export class EmailTemplateService {
   async scheduleEmail(emailDetails) {
     emailDetails.groupName = JSON.stringify(emailDetails.groupName);
     emailDetails.attachment = JSON.stringify(emailDetails.attachment);
+    emailDetails.ScheduleDate = new Date(emailDetails.ScheduleDate);
 
     return await this._emailTemplateRepository.save(emailDetails);
   }
@@ -46,14 +48,16 @@ export class EmailTemplateService {
           });
         }
 
-        let userEmails: [] | undefined;
+        let userEmails: string[] = [];
 
         for (let i = 0; i < toSend.groupName.length; i++) {
           const entityManager = getManager();
-          userEmails = await entityManager.query(
+          const res = await entityManager.query(
             `select email  from "tblGroups" tg  inner join "tblUsers" tu on tu."groupId" = tg.id where "groupName" = '${toSend.groupName[i]}'`,
           );
+          userEmails.push(res[0]);
         }
+
         userEmails.map(async (mails) => {
           const mail = {
             to: mails['email'],
@@ -62,11 +66,15 @@ export class EmailTemplateService {
             text: toSend['content'],
             attachments: attachment,
           };
-          await this.client
-            .send(mail)
-            .then(() => console.log('Test email sent successfully'));
+          await this.client.send(mail);
         });
+
+        await this._emailTemplateRepository.update(
+          { id: toSend['id'] },
+          { isSent: Flags.Y },
+        );
       });
+      console.log('Test email sent successfully');
     } catch (error) {
       console.error('Error sending test email');
       console.error(error);

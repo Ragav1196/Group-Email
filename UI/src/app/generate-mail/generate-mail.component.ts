@@ -20,12 +20,7 @@ export class GenerateMailComponent implements OnInit {
   ngOnInit(): void {
     this.api.get('/groups/get-groups').subscribe(
       (res: any) => {
-        if (res['statusCode'] == 200) {
-          this.groupNames.push(...res);
-        } else {
-          console.log(res['statusCode'], res);
-          this.groupNames.push(...res);
-        }
+        this.groupNames.push(...res);
       },
       (err) => {
         console.log(err);
@@ -84,7 +79,7 @@ export class GenerateMailComponent implements OnInit {
     };
     console.log('MAIL TEMPLATE', sendData);
     {
-      this.api.post('/email-template', sendData).subscribe(
+      this.api.post('/email/schedule', sendData).subscribe(
         (res: any) => {
           if (res['statusCode'] == 200) {
             console.log(this.rep, 'res', res);

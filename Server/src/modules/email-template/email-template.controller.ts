@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CreateEmailTemplateDto } from './dto/email-template.dto';
 import { EmailTemplateService } from './email-template.service';
-@Controller('email-template')
+@Controller('email')
 export class EmailTemplateController {
   constructor(private readonly emailTemplateService: EmailTemplateService) {}
 
-  @Post()
+  @Post('schedule')
   scheduleEmail(@Body() _createEmailTemplateDto: CreateEmailTemplateDto) {
     return this.emailTemplateService.scheduleEmail(_createEmailTemplateDto);
   }

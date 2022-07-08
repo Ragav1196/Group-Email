@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { typeOrmConfig } from './configs/config.constants';
 import { EmailTemplateModule } from './modules/email-template/email-template.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { EmailTemplateModule } from './modules/email-template/email-template.mod
     GroupsModule,
     UsersModule,
     EmailTemplateModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
