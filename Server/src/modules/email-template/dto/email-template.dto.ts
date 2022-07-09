@@ -5,13 +5,12 @@ export class CreateEmailTemplateDto {
   @IsString()
   content: string;
 
-  @IsNotEmpty()
+  // @IsString()
   attachment: string[];
 
   @IsNotEmpty()
   groupName: string[];
 
   @IsNotEmpty()
-  @IsString()
   ScheduleDate: string;
 }

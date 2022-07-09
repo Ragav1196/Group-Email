@@ -31,59 +31,108 @@ export class EmailTemplateService {
         where: { isSent: 'N' },
       });
 
-      mailToSend.map(async (toSend) => {
-        console.log(
-          new Date(toSend['ScheduleDate']).getDate() === new Date().getDate(),
+      async function getUserName(groupName) {
+        const entityManager = getManager();
+        return await entityManager.query(
+          `select email  from "tblGroups" tg  inner join "tblUsers" tu on tu."groupId" = tg.id where "groupName" = '${groupName}'`,
         );
-        if (
-          new Date(toSend['ScheduleDate']).getDate() === new Date().getDate()
-        ) {
-          toSend['attachment'] = JSON.parse(toSend['attachment']);
-          toSend['groupName'] = JSON.parse(toSend['groupName']);
+      }
 
-          const attachment = [];
+      async function getUserEmailList() {
+        let userEmails: any[] = [];
+        await Promise.all(
+          mailToSend.map(async (toSend, index) => {
+            let arr = [];
+            let obj = {};
+            if (
+              new Date(toSend['ScheduleDate']).getDate() ===
+              new Date().getDate()
+            ) {
+              toSend['attachment'] = JSON.parse(toSend['attachment']);
+              toSend['groupName'] = JSON.parse(toSend['groupName']);
 
-          for (let i = 0; i < toSend['attachment'].length; i++) {
-            attachment.push({
-              filename: `attachment-${i + 1}.${
-                toSend['attachment'][i]['type'].split('/')[1]
-              }`,
-              type: toSend['attachment'][i]['type'],
-              content: toSend['attachment'][i]['base64File'].split(',')[1],
-              disposition: 'inline',
-              content_id: `image-${i + 1}`,
-            });
-          }
+              let userEmail = [];
+              for (let i = 0; i < toSend.groupName.length; i++) {
+                const result = await getUserName(toSend.groupName[i]);
+                result.map((r) => userEmail.push(r));
+              }
+              userEmail.map((u) => {
+                arr.push(u.email);
+                obj['email'] = arr;
+              });
+              userEmails.push(obj);
+            }
+          }),
+        );
+        return userEmails;
+      }
+      const res = await getUserEmailList();
 
-          let userEmails: string[] = [];
+      mailToSend.map((toSend, index) => {
+        let arr = [];
+        for (let i = 0; i < toSend['attachment'].length; i++) {
+          arr.push({
+            filename: `attachment-${i + 1}.${
+              toSend['attachment'][i]['type'].split('/')[1]
+            }`,
+            type: toSend['attachment'][i]['type'],
+            content: toSend['attachment'][i]['base64File'].split(',')[1],
+            disposition: 'inline',
+            content_id: `image-${i + 1}`,
+          });
+        }
 
-          for (let i = 0; i < toSend.groupName.length; i++) {
-            const entityManager = getManager();
-            const res = await entityManager.query(
-              `select email  from "tblGroups" tg  inner join "tblUsers" tu on tu."groupId" = tg.id where "groupName" = '${toSend.groupName[i]}'`,
-            );
-            userEmails.push(...res);
-          }
+        res[index]['attachment'] = arr;
+        res[index]['content'] = toSend['content'];
+        res[index]['id'] = toSend['id'];
+      });
 
-          userEmails.map(async (mails) => {
-            console.log(mails['email']);
-            const mail = {
-              to: mails['email'],
+      async function final(client, _emailTemplateRepository) {
+        const mail = [];
+        let id = [];
+        res.map((mails) => {
+          id.push(mails.id);
+          for (let i = 0; i < mails.email.length; i++) {
+            mail.push({
+              to: mails.email[i],
               subject: 'Hello',
               from: process.env.FromMail,
-              text: toSend['content'],
-              attachments: attachment,
-            };
-            await this.client.send(mail);
-          });
+              text: mails.content,
+              attachments: mails.attachment,
+            });
+          }
+        });
 
-          await this._emailTemplateRepository.update(
-            { id: toSend['id'] },
-            { isSent: Flags.Y },
-          );
-          console.log('Test email sent successfully');
+        let error = false;
+
+        await Promise.all(
+          mail.map(async (c, index) => {
+            return await client
+              .send(c)
+              .then(async (response) => {
+                if (response[0].statusCode === 202) {
+                  await _emailTemplateRepository.update(
+                    { id: id[index] },
+                    { isSent: Flags.Y },
+                  );
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                error = true;
+              });
+          }),
+        );
+
+        if (error) {
+          return { Message: 'Mail Dispatch Unsuccessful' };
+        } else {
+          return { Message: 'Mail Dispatch Successful' };
         }
-      });
+      }
+
+      const resss = await final(this.client, this._emailTemplateRepository);
+      return resss;
     } catch (error) {
       console.error('Error sending test email');
       console.error(error);
