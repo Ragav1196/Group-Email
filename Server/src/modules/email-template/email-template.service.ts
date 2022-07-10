@@ -19,7 +19,6 @@ export class EmailTemplateService {
   async scheduleEmail(emailDetails) {
     emailDetails.groupName = JSON.stringify(emailDetails.groupName);
     emailDetails.attachment = JSON.stringify(emailDetails.attachment);
-    emailDetails.ScheduleDate = new Date(emailDetails.ScheduleDate);
 
     return await this._emailTemplateRepository.save(emailDetails);
   }
@@ -27,91 +26,96 @@ export class EmailTemplateService {
   @Cron(CronExpression.EVERY_DAY_AT_10AM)
   async sendEmail() {
     try {
-      const mailToSend = await this._emailTemplateRepository.find({
+      const selectedMailTemplate = await this._emailTemplateRepository.find({
         where: { isSent: 'N' },
       });
 
-      async function getUserName(groupName) {
+      async function getUserEmailId(groupName) {
         const entityManager = getManager();
         return await entityManager.query(
           `select email  from "tblGroups" tg  inner join "tblUsers" tu on tu."groupId" = tg.id where "groupName" = '${groupName}'`,
         );
       }
 
-      async function getUserEmailList() {
-        let userEmails: any[] = [];
+      async function getUserEmailIdList() {
+        let completeMailTemplateDetails: any[] = [];
         await Promise.all(
-          mailToSend.map(async (toSend, index) => {
-            let arr = [];
-            let obj = {};
+          selectedMailTemplate.map(async (mailTemplate) => {
+            let currentGrpEmailIdArray = [];
+            let currentGrpEmailIdObject = {};
             if (
-              new Date(toSend['ScheduleDate']).getDate() ===
+              new Date(mailTemplate['ScheduleDate']).getDate() ===
               new Date().getDate()
             ) {
-              toSend['attachment'] = JSON.parse(toSend['attachment']);
-              toSend['groupName'] = JSON.parse(toSend['groupName']);
+              mailTemplate['attachment'] = JSON.parse(
+                mailTemplate['attachment'],
+              );
+              mailTemplate['groupName'] = JSON.parse(mailTemplate['groupName']);
 
-              let userEmail = [];
-              for (let i = 0; i < toSend.groupName.length; i++) {
-                const result = await getUserName(toSend.groupName[i]);
-                result.map((r) => userEmail.push(r));
+              let currentGrpUserEmailId = [];
+              for (let i = 0; i < mailTemplate.groupName.length; i++) {
+                const emailIdList = await getUserEmailId(
+                  mailTemplate.groupName[i],
+                );
+                emailIdList.map((emailId) =>
+                  currentGrpUserEmailId.push(emailId),
+                );
               }
-              userEmail.map((u) => {
-                arr.push(u.email);
-                obj['email'] = arr;
+              currentGrpUserEmailId.map((emailId) => {
+                currentGrpEmailIdArray.push(emailId.email);
+                currentGrpEmailIdObject['email'] = currentGrpEmailIdArray;
               });
-              userEmails.push(obj);
+              completeMailTemplateDetails.push(currentGrpEmailIdObject);
             }
           }),
         );
-        return userEmails;
+        return completeMailTemplateDetails;
       }
-      const res = await getUserEmailList();
+      const completeMailTemplateDetails = await getUserEmailIdList();
 
-      mailToSend.map((toSend, index) => {
-        let arr = [];
-        for (let i = 0; i < toSend['attachment'].length; i++) {
-          arr.push({
+      selectedMailTemplate.map((mailTemplate, index) => {
+        let attachmentArray = [];
+        for (let i = 0; i < mailTemplate['attachment'].length; i++) {
+          attachmentArray.push({
             filename: `attachment-${i + 1}.${
-              toSend['attachment'][i]['type'].split('/')[1]
+              mailTemplate['attachment'][i]['type'].split('/')[1]
             }`,
-            type: toSend['attachment'][i]['type'],
-            content: toSend['attachment'][i]['base64File'].split(',')[1],
+            type: mailTemplate['attachment'][i]['type'],
+            content: mailTemplate['attachment'][i]['base64File'].split(',')[1],
             disposition: 'inline',
             content_id: `image-${i + 1}`,
           });
         }
 
-        res[index]['attachment'] = arr;
-        res[index]['content'] = toSend['content'];
-        res[index]['id'] = toSend['id'];
+        completeMailTemplateDetails[index]['attachment'] = attachmentArray;
+        completeMailTemplateDetails[index]['content'] = mailTemplate['content'];
+        completeMailTemplateDetails[index]['id'] = mailTemplate['id'];
       });
 
-      async function final(client, _emailTemplateRepository) {
-        const mail = [];
-        let id = [];
-        res.map((mails) => {
-          id.push(mails.id);
-          for (let i = 0; i < mails.email.length; i++) {
-            mail.push({
-              to: mails.email[i],
+      async function sendEmail(sendGridClient, emailTemplateRepository) {
+        const mailAttachment = [];
+        const id: number[] = [];
+        let error: boolean = false;
+        completeMailTemplateDetails.map((details) => {
+          id.push(details.id);
+          for (let i = 0; i < details.email.length; i++) {
+            mailAttachment.push({
+              to: details.email[i],
               subject: 'Hello',
               from: process.env.FromMail,
-              text: mails.content,
-              attachments: mails.attachment,
+              text: details.content,
+              attachments: details.attachment,
             });
           }
         });
 
-        let error = false;
-
         await Promise.all(
-          mail.map(async (c, index) => {
-            return await client
-              .send(c)
+          mailAttachment.map(async (details, index) => {
+            return await sendGridClient
+              .send(details)
               .then(async (response) => {
                 if (response[0].statusCode === 202) {
-                  await _emailTemplateRepository.update(
+                  await emailTemplateRepository.update(
                     { id: id[index] },
                     { isSent: Flags.Y },
                   );
@@ -131,8 +135,11 @@ export class EmailTemplateService {
         }
       }
 
-      const resss = await final(this.client, this._emailTemplateRepository);
-      return resss;
+      const response = await sendEmail(
+        this.client,
+        this._emailTemplateRepository,
+      );
+      return response;
     } catch (error) {
       console.error('Error sending test email');
       console.error(error);

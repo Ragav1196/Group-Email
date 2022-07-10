@@ -11,7 +11,7 @@ export class EmailTemplateController {
   }
 
   @Post('send-email')
-  sendEmail(/* @Body() _createEmailTemplateDto: CreateEmailTemplateDto */) {
-    return this.emailTemplateService.sendEmail(/* _createEmailTemplateDto */);
+  sendEmail() {
+    return this.emailTemplateService.sendEmail();
   }
 }
