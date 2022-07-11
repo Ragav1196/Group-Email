@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateEmailTemplateDto } from './dto/email-template.dto';
 import { EmailTemplateService } from './email-template.service';
 @Controller('email')
@@ -13,5 +21,11 @@ export class EmailTemplateController {
   @Post('send-email')
   sendEmail() {
     return this.emailTemplateService.sendEmail();
+  }
+
+  @Post('post')
+  @UseInterceptors(FileInterceptor('image'))
+  postFile(@UploadedFile() file) {
+    console.log(file)
   }
 }
