@@ -1,24 +1,25 @@
 <div>
-  <div>
-    <h2>Create Group</h2>
-  </div>
-</div>
-
-<div>
-  <form [formGroup]="apForm" (ngSubmit)="sendForm()">
-    <label>Group Name:</label>
-    <br />
-    <br />
-    <input
-      type="text"
-      formControlName="groupname"
-      id="groupname"
-      placeholder="Group Name"
-    />
-    <br />
-    <br />
     <div>
-      <button type="submit">Submit</button>
+      <h2>Create Group</h2>
     </div>
-  </form>
-</div>
+  </div>
+  
+  <div>
+    <form [formGroup]="apForm" (ngSubmit)="sendForm()">
+      <label>Group Name:</label>
+      <br />
+      <br />
+      <input
+        type="text"
+        formControlName="groupname"
+        id="groupname"
+        placeholder="Group Name"
+      />
+      <br />
+      <br />
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+  

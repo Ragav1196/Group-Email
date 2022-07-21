@@ -1,0 +1,81 @@
+<div class="text-center">
+  <div>
+    <h2>Create User</h2>
+  </div>
+</div>
+
+<div>
+  <form [formGroup]="apform" (ngSubmit)="sendDetails()">
+    <label>First Name</label>
+    <br />
+    <br />
+    <input
+      type="text"
+      formControlName="firtsname"
+      id="firtsname"
+      placeholder="First Name"
+    />
+    <br />
+    <br />
+
+    <label>Last Name</label>
+    <br />
+    <br />
+    <input
+      type="text"
+      formControlName="lastname"
+      id="lastname"
+      placeholder="Last Name"
+    />
+    <br />
+    <br />
+
+    <label>Phone Number</label>
+    <br />
+    <br />
+    <input
+      type="number"
+      formControlName="phonenumber"
+      id="phonenumber"
+      placeholder="Phone Number"
+    />
+    <br />
+    <br />
+
+    <label>Email Address</label>
+    <br />
+    <br />
+    <input
+      type="email"
+      formControlName="emailaddress"
+      id="emailaddress"
+      placeholder="Email Address"
+    />
+    <br />
+    <br />
+
+    <label for="myfile">Select Group Name:</label>
+    <br /><br />
+    <select name="groupname" formControlName="groupname" id="groupname">
+      <option value="default">----</option>
+      <option *ngFor="let groupname of groupNames" [value]="groupname">
+        {{ groupname }}
+      </option>
+    </select>
+
+    <!-- <label>Group Name</label>
+    <br />
+    <br />
+    <input
+      type="text"
+      formControlName="groupname"
+      id="groupname"
+      placeholder="Group Name"
+    />
+    <br />
+    <br /> -->
+    <div class="text-center">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+</div>

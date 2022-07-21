@@ -1,3 +1,75 @@
-<app-group-creation></app-group-creation>
+<!-- <app-group-creation></app-group-creation>
 <app-user-creation></app-user-creation>
-<app-generate-mail></app-generate-mail>
+<app-generate-mail></app-generate-mail> -->
+
+<mat-toolbar color="secondary" class="example-toolbar">
+  <h1 class="example-app-name">Menu</h1>
+</mat-toolbar>
+<mat-sidenav-container class="example-container" autosize>
+  <mat-sidenav
+    #sidenav
+    class="example-sidenav"
+    mode="side"
+    opened="true"
+    (mouseenter)="mouseenter()"
+    (mouseleave)="mouseleave()"
+  >
+    <mat-nav-list>
+      <div class="submenu" [ngClass]="{ expanded: showSubmenu }">
+        <a
+          mat-list-item
+          href="..."
+          routerLink="/create-group"
+          routerLinkActive="active"
+          >Create Group</a
+        >
+        <a
+          mat-list-item
+          href="..."
+          routerLink="/create-user"
+          routerLinkActive="active"
+          >Create User</a
+        >
+
+        <a
+          mat-list-item
+          href="..."
+          routerLink="/schedule-mail"
+          routerLinkActive="active"
+          >Schedule E-mail</a
+        >
+        <!--  <mat-list-item
+          (click)="showSubSubMenu = !showSubSubMenu"
+          class="parent"
+        >
+          <span class="full-width" *ngIf="isExpanded || isShowing"
+            >Nested Menu</span
+          >
+          <mat-icon
+            class="menu-button"
+            [ngClass]="{ rotated: showSubSubMenu }"
+            *ngIf="isExpanded || isShowing"
+            >expand_more</mat-icon
+          >
+        </mat-list-item> -->
+        <div
+          class="submenu"
+          [ngClass]="{ expanded: showSubSubMenu }"
+          *ngIf="isShowing || isExpanded"
+        >
+          <mat-list-item>SubSubmenu Item 1</mat-list-item>
+          <mat-list-item>SubSubmenu Item 2</mat-list-item>
+        </div>
+      </div>
+    </mat-nav-list>
+    <mat-nav-list> </mat-nav-list>
+  </mat-sidenav>
+
+  <div style="margin-top: 3px" class="example-sidenav-content">
+    <router-outlet></router-outlet>
+  </div>
+</mat-sidenav-container>
+
+<!-- Copyright 2017 Google Inc. All Rights Reserved.
+    Use of this source code is governed by an MIT-style license that
+    can be found in the LICENSE file at http://angular.io/license -->

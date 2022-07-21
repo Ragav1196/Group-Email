@@ -20,7 +20,7 @@ export class EmailTemplate extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @Column()
+  @Column({ default: null })
   attachment: string;
 
   @Column()

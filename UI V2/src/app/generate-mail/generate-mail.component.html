@@ -1,0 +1,56 @@
+<div>
+  <div>
+    <h2>Mail service</h2>
+  </div>
+</div>
+
+<div>
+  <form [formGroup]="apMail" (ngSubmit)="sendMail()">
+    <label for="mail-template">Mail Template:</label>
+    <br /><br />
+    <textarea
+      name="mail-template"
+      id="mail-template"
+      cols="30"
+      rows="10"
+      formControlName="mailtemplate"
+    ></textarea>
+    <br /><br />
+
+    <label for="myfile">Select Files:</label>
+    <br /><br />
+    <input
+      type="file"
+      (change)="handleUpload($event)"
+      formControlName="files"
+      id="myfile"
+      name="myfile"
+      multiple
+    />
+    <br /><br />
+
+    <label for="myfile">Select Group Name:</label>
+    <br /><br />
+    <select
+      name="groupname"
+      formControlName="groupname"
+      id="groupname"
+      multiple
+    >
+      <option value="default">Select Group</option>
+      <option *ngFor="let groupname of groupNames" [value]="groupname">
+        {{ groupname }}
+      </option>
+    </select>
+    <br /><br />
+
+    <label for="myfile">Sechudule Date:</label>
+    <br /><br />
+    <input type="date" formControlName="date" id="Sechuduledate" />
+    <br /><br />
+
+    <div>
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+</div>

@@ -4,7 +4,7 @@ import { CommonServiceService } from '../common-service.service';
 @Component({
   selector: 'app-generate-mail',
   templateUrl: './generate-mail.component.html',
-  styleUrls: ['./generate-mail.component.css'],
+  styleUrls: ['./generate-mail.component.scss'],
 })
 export class GenerateMailComponent implements OnInit {
   apMail!: FormGroup;
@@ -81,12 +81,8 @@ export class GenerateMailComponent implements OnInit {
     {
       this.api.post('/email/schedule', sendData).subscribe(
         (res: any) => {
-          if (res['statusCode'] == 200) {
-            console.log(this.rep, 'res', res);
-            this.ngOnInit();
-          } else {
-            console.log(res['statusCode'], res);
-          }
+          console.log(this.rep, 'res', res);
+          this.ngOnInit();
         },
         (err) => {
           console.log(err);

@@ -5,7 +5,7 @@ import { CommonServiceService } from '../common-service.service';
 @Component({
   selector: 'app-user-creation',
   templateUrl: './user-creation.component.html',
-  styleUrls: ['./user-creation.component.css'],
+  styleUrls: ['./user-creation.component.scss'],
 })
 export class UserCreationComponent implements OnInit {
   apform!: FormGroup;
@@ -20,12 +20,8 @@ export class UserCreationComponent implements OnInit {
   ngOnInit(): void {
     this.api.get('/groups/get-groups').subscribe(
       (res: any) => {
-        if (res['statusCode'] == 200) {
-          this.groupNames.push(...res);
-        } else {
-          console.log(res['statusCode'], res);
-          this.groupNames.push(...res);
-        }
+        console.log(res['statusCode'], res);
+        this.groupNames.push(...res);
       },
       (err) => {
         console.log(err);
@@ -59,12 +55,8 @@ export class UserCreationComponent implements OnInit {
     {
       this.api.post('/users/create', sendUser).subscribe(
         (res: any) => {
-          if (res['statusCode'] == 200) {
-            console.log(this.data, 'res', res);
-            this.ngOnInit();
-          } else {
-            console.log(res['statusCode'], res);
-          }
+          console.log(this.data, 'res', res);
+          this.ngOnInit();
         },
         (err) => {
           console.log(err);

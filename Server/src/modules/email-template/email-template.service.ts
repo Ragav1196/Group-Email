@@ -16,6 +16,19 @@ export class EmailTemplateService {
     @InjectSendGrid() private readonly client: SendGridService,
   ) {}
 
+  mailHeader = `<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Document</title>
+    </head>`;
+
+  mailFooter = `
+  </html>
+    `;
+
   async scheduleEmail(emailDetails) {
     emailDetails.groupName = JSON.stringify(emailDetails.groupName);
     emailDetails.attachment = JSON.stringify(emailDetails.attachment);
@@ -75,16 +88,19 @@ export class EmailTemplateService {
 
       selectedMailTemplate.map((mailTemplate, index) => {
         let attachmentArray = [];
-        for (let i = 0; i < mailTemplate['attachment'].length; i++) {
-          attachmentArray.push({
-            filename: `attachment-${i + 1}.${
-              mailTemplate['attachment'][i]['type'].split('/')[1]
-            }`,
-            type: mailTemplate['attachment'][i]['type'],
-            content: mailTemplate['attachment'][i]['base64File'].split(',')[1],
-            disposition: 'inline',
-            content_id: `image-${i + 1}`,
-          });
+        if (mailTemplate['attachment'] !== null) {
+          for (let i = 0; i < mailTemplate['attachment'].length; i++) {
+            attachmentArray.push({
+              filename: `attachment-${i + 1}.${
+                mailTemplate['attachment'][i]['type'].split('/')[1]
+              }`,
+              type: mailTemplate['attachment'][i]['type'],
+              content:
+                mailTemplate['attachment'][i]['base64File'].split(',')[1],
+              disposition: 'inline',
+              content_id: `image-${i + 1}`,
+            });
+          }
         }
 
         completeMailTemplateDetails[index]['attachment'] = attachmentArray;
@@ -92,7 +108,12 @@ export class EmailTemplateService {
         completeMailTemplateDetails[index]['id'] = mailTemplate['id'];
       });
 
-      async function sendEmail(sendGridClient, emailTemplateRepository) {
+      async function sendEmail(
+        sendGridClient,
+        emailTemplateRepository,
+        mailHeader,
+        mailFooter,
+      ) {
         const mailAttachment = [];
         const id: number[] = [];
         let error: boolean = false;
@@ -105,6 +126,9 @@ export class EmailTemplateService {
               from: process.env.FromMail,
               text: details.content,
               attachments: details.attachment,
+              html: `${mailHeader}
+              <body>${details.content}</body>
+              ${mailFooter}`,
             });
           }
         });
@@ -138,6 +162,8 @@ export class EmailTemplateService {
       const response = await sendEmail(
         this.client,
         this._emailTemplateRepository,
+        this.mailHeader,
+        this.mailFooter,
       );
       return response;
     } catch (error) {
